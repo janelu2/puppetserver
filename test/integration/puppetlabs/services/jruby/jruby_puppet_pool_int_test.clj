@@ -362,6 +362,34 @@
          (finally
            (jruby-testutils/return-instance jruby-service jruby-instance :settings-plumbed-test)))))))
 
+(deftest jruby-environment-vars-test
+  (testing "Make sure that the environment variables whitelisted in puppetserver.conf are being set"
+    (tk-testutils/with-app-with-config
+     app
+     [jruby/jruby-puppet-pooled-service
+      profiler/puppet-profiler-service
+      jruby-utils/jruby-pool-manager-service]
+     (jruby-testutils/jruby-puppet-tk-config
+      (jruby-testutils/jruby-puppet-config
+       {:ruby-load-path  jruby-testutils/ruby-load-path
+        :gem-home        jruby-testutils/gem-home
+        :master-conf-dir jruby-testutils/conf-dir
+        :master-code-dir jruby-testutils/code-dir
+        :master-var-dir  jruby-testutils/var-dir
+        :master-run-dir  jruby-testutils/run-dir
+        :master-log-dir  jruby-testutils/log-dir
+        :environment-vars jruby-testutils/environment-vars}))
+     (let [jruby-service (tk-app/get-service app :JRubyPuppetService)
+           jruby-instance (jruby-testutils/borrow-instance jruby-service :test)
+           jruby-puppet (:jruby-puppet jruby-instance)
+           jruby-scripting-container (:scripting-container jruby-instance)
+           jruby-env (.runScriptlet jruby-scripting-container "ENV")]
+       (try
+         (is (= #{"HOME" "PATH" "GEM_HOME" "JARS_NO_REQUIRE" "JARS_REQUIRE" "FOO"}
+                (set (keys jruby-env))))
+         (finally
+           (jruby-testutils/return-instance jruby-service jruby-instance :settings-plumbed-test)))))))
+
 (deftest master-termination-test
   (testing "Flushing the pool causes masters to be terminated"
     (with-redefs [jruby-puppet-core/cleanup-fn
