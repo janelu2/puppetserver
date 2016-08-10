@@ -89,7 +89,8 @@
                        :build-type "foss"
                        :java-args "-Xms2g -Xmx2g -XX:MaxPermSize=256m"
                        :repo-target "PC1"
-                       :bootstrap-source :services-d}
+                       :bootstrap-source :services-d
+                       :restart-file "/opt/puppetlabs/server/data/puppetserver/restartcounter.txt"}
                 :resources {:dir "tmp/ezbake-resources"}
                 :config-dir "ezbake/config"
                 :system-config-dir "ezbake/system-config"}
@@ -132,7 +133,7 @@
                                                [puppetlabs/puppetserver ~ps-version]
                                                [puppetlabs/trapperkeeper-webserver-jetty9 ~tk-jetty-version]
                                                [org.clojure/tools.nrepl "0.2.3"]]
-                      :plugins [[puppetlabs/lein-ezbake "0.4.3"]]
+                      :plugins [[puppetlabs/lein-ezbake "1.0.0-SNAPSHOT"]]
                       :name "puppetserver"}
              :uberjar {:aot [puppetlabs.trapperkeeper.main]
                        :dependencies [[puppetlabs/trapperkeeper-webserver-jetty9 ~tk-jetty-version]]}
